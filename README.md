@@ -13,7 +13,15 @@
 7. Vlastní databáze: typy, klíče, CREATE, INSERT, UPDATE, DELETE, RETURNING, ALTER, CHECK, transakce.
 8. Závěrečná praxe: CASE, NULLIF, pohledy, CSV, ROLLUP, závěrečný projekt.
 
-Každá lekce obsahuje výklad, spustitelnou ukázku, dvě úlohy, nápovědy a řešení. Dále je k dispozici mapa vztahů, prohlížeč tabulek, SQL tahák, export výsledků a import CSV do vlastní tabulky.
+Každá lekce postupuje od výkladu k příkladům a teprve potom k samostatným úlohám:
+
+1. Cíl lekce, vysvětlení nových příkazů a obecný vzor zápisu.
+2. Alespoň dva vedené příklady (v první lekci tři), každý s rozborem a očekávaným výsledkem. Celkem 63 příkladů; každý má vlastní tlačítko pro vložení do editoru.
+3. Dvě samostatné úlohy s kontrolou, nápovědami a řešením. Student na ně přechází tlačítkem „Přejít na úlohy“.
+
+Lekce se běžně otevírají v režimu příkladů. Příklady se nehodnotí a jejich SQL editor má samostatně uložený koncept, takže nepoškodí rozpracované řešení úlohy. Vložení příkladu obnoví výchozí databázi, aby šlo opakovat i příkazy měnící schéma nebo data. Přímé odkazy na úlohy (`#prvni-dotaz/1`) fungují i nadále.
+
+Dále je k dispozici mapa vztahů, prohlížeč tabulek, SQL tahák, export výsledků a import CSV do vlastní tabulky.
 
 Témata navazují na uživatelem dodanou učebnici „SQL kurz“ s 102 číslovanými videočástmi. Instalaci a ovládání PgAdminu nahrazuje práce v prohlížeči. Výklady, zadání a malá deterministická databáze jsou nově vytvořené. Obsahuje fiktivní filmy, zákazníky a studijní skupiny; nevyžaduje stahování původní databáze dvdrental ani externích tabulek. Odkaz na původní doplňující videa je v aplikaci; jejich zhlédnutí není podmínkou.
 
@@ -32,7 +40,7 @@ npm run build
 npm run preview
 ```
 
-`npm test` spouští testy přes `node:test` s TypeScript loaderem. Všech 62 referenčních řešení se vykoná proti skutečnému PGlite, včetně kontrol změn schématu a dat. Testují se i chybná řešení, řazení, duplicity, NULL a CSV. Testy jsou záměrně sekvenční a mohou trvat několik minut kvůli vytváření izolovaných databází. V `tests/browser-smoke.mjs` je doplňující kontrola sestavené aplikace přes Playwright; po spuštění preview ji lze provést příkazem `node tests/browser-smoke.mjs`. Vyžaduje Chromium (`npx playwright install chromium`, případně proměnná `CHROMIUM_PATH` k místnímu prohlížeči).
+`npm test` spouští testy přes `node:test` s TypeScript loaderem. Všech 63 vedených příkladů a 62 referenčních řešení se vykoná proti skutečnému PGlite, včetně kontrol změn schématu a dat. U příkladů se ověřují také uvedené počty výsledných řádků. Testují se i chybná řešení, řazení, duplicity, NULL a CSV. Testy jsou záměrně sekvenční a mohou trvat několik minut kvůli vytváření izolovaných databází. V `tests/browser-smoke.mjs` je doplňující kontrola sestavené aplikace přes Playwright: ověřuje i pořadí výklad–příklady–úlohy a oddělené ukládání rozepsaných dotazů. Po spuštění preview ji lze provést příkazem `node tests/browser-smoke.mjs`. Vyžaduje Chromium (`npx playwright install chromium`, případně proměnná `CHROMIUM_PATH` k místnímu prohlížeči).
 
 Pro další cloudové úlohy používejte existující checkout; není třeba vytvářet worktree. Závislosti mohou být již připravené, běžící server je však nutné po obnovení prostředí spustit znovu.
 
@@ -55,6 +63,7 @@ Workflow nejprve provede testy a produkční build, potom publikuje `dist`. GitH
 ## Úpravy obsahu
 
 - `src/course.ts`: moduly, výklady, ukázky a zadání. Každá úloha má řešení, nápovědy a případně `ordered`, `setup` nebo `verify` pro kontrolu databázového stavu.
+- `src/teaching.ts`: výukové cíle, vysvětlení příkazů a rozebrané příklady s očekávanými výsledky pro všechny lekce.
 - `src/data.ts`: výchozí SQL databáze a popisy tabulek.
 - `src/engine.ts`: spouštění a kontrola řešení.
 - `src/worker.ts`: izolovaný databázový proces a CSV import.

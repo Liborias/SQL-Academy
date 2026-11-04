@@ -3,11 +3,36 @@ import assert from 'node:assert/strict';
 import { lessons } from '../src/course';
 import { createDatabase,checkExercise,equivalent } from '../src/engine';
 import { parseCSV,toCSV } from '../src/csv';
+import { guides, workedExamples } from '../src/teaching';
 test('31 lessons, 62 unique exercises and all reference queries execute',async()=>{
  assert.equal(lessons.length,31);assert.equal(new Set(lessons.map(l=>l.id)).size,31);assert.equal(lessons.flatMap(l=>l.exercises).length,62);
  const db=await createDatabase();
- try{for(const l of lessons){await db.exec('BEGIN;');try{await db.exec(l.example);}finally{await db.exec('ROLLBACK;');}
+ try{for(const l of lessons){
+ assert(guides[l.id],`Missing teaching guide for ${l.id}`);
+ assert(workedExamples(l).length>=2,`Not enough worked examples for ${l.id}`);
+ for(const example of workedExamples(l)){
+  await db.exec('BEGIN;');
+  try{
+   const results=await db.exec(example.sql);
+   if(example.expectedRows!==undefined) assert.equal(results.at(-1)?.rows.length,example.expectedRows,`${l.id}: ${example.title}`);
+  }finally{await db.exec('ROLLBACK;');}
+ }
  for(const ex of l.exercises){console.log('Checking',l.id,ex.title);const r=await checkExercise(ex,ex.solution);assert.equal(r.passed,true,`${l.id}: ${ex.title}`);}}
+ }finally{await db.close();}
+});
+test('first lesson explains SELECT/FROM and demonstrates whole tables and selected columns',async()=>{
+ const db=await createDatabase();
+ try{
+  const examples=workedExamples(lessons[0]);
+  assert.equal(examples.length,3);
+  const results=await Promise.all(examples.map(ex=>db.query(ex.sql)));
+  assert.deepEqual(results.map(r=>r.fields.map(f=>f.name)),[
+   ['film_id','title','description','release_year','length','rental_rate','replacement_cost','rating','language_id'],
+   ['title'],['title','length'],
+  ]);
+  assert(results.every(r=>r.rows.length===10));
+  assert(guides['prvni-dotaz'].concepts.some(c=>c.command==='SELECT'));
+  assert(guides['prvni-dotaz'].concepts.some(c=>c.command==='FROM'));
  }finally{await db.close();}
 });
 test('grader rejects wrong rows, names, ordering and duplicate counts',()=>{
